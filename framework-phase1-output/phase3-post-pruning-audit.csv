@@ -1,0 +1,4 @@
+"Component","Dependency","File"
+"mailsender-impl","MailArchiveService","components.xml"
+"sakai-mailarchive-impl","LTIService","components.xml"
+"sakai-mailarchive-impl","MailArchiveService","components.xml"

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- database beans -->
+    <bean id="org.sakaiproject.authz.impl.DbAuthzGroupSqlDefault"   class="org.sakaiproject.authz.impl.DbAuthzGroupSqlDefault"/>
+    <bean id="org.sakaiproject.authz.impl.DbAuthzGroupSqlHSql"      class="org.sakaiproject.authz.impl.DbAuthzGroupSqlHSql"/>
+    <bean id="org.sakaiproject.authz.impl.DbAuthzGroupSqlMySql"     class="org.sakaiproject.authz.impl.DbAuthzGroupSqlMySql"/>
+    <bean id="org.sakaiproject.authz.impl.DbAuthzGroupSqlOracle"    class="org.sakaiproject.authz.impl.DbAuthzGroupSqlOracle"/>
+
+	<bean id="org.sakaiproject.authz.api.AuthzGroupService"
+			class="org.sakaiproject.authz.impl.DbAuthzGroupService"
+			init-method="init"
+			destroy-method="destroy">
+
+		<property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager"/>
+		<property name="functionManager" ref="org.sakaiproject.authz.api.FunctionManager"/>
+		<property name="groupProvider" ref="org.sakaiproject.authz.api.GroupProvider"/>
+		<property name="microsoftMessagingService" ref="org.sakaiproject.messaging.api.MicrosoftMessagingService"/>
+		<property name="roleProvider" ref="org.sakaiproject.authz.api.RoleProvider"/>
+		<property name="schedulingService" ref="org.sakaiproject.scheduling.api.SchedulingService"/>
+		<property name="securityService" ref="org.sakaiproject.authz.api.SecurityService"/>
+		<property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService"/>
+		<property name="sqlService" ref="org.sakaiproject.db.api.SqlService"/>
+		<property name="timeService" ref="org.sakaiproject.time.api.TimeService"/>
+		<property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService"/>
+ 		<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService"/>
+ 		<property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager"/>
+ 		<property name="siteService" ref="org.sakaiproject.site.api.SiteService"/>
+
+ 		<property name="autoDdl"><value>${auto.ddl}</value></property>
+ 		<property name="promoteUsersToProvided"><value>true</value></property>
+ 		<property name="promoteUsersToProvidedRole"><value>false</value></property>
+        <property name="databaseBeans">
+           <map>
+              <entry key="default"><ref bean="org.sakaiproject.authz.impl.DbAuthzGroupSqlDefault"/></entry>
+              <entry key="hsqldb" ><ref bean="org.sakaiproject.authz.impl.DbAuthzGroupSqlHSql"   /></entry>
+              <entry key="mysql"  ><ref bean="org.sakaiproject.authz.impl.DbAuthzGroupSqlMySql"  /></entry>
+              <entry key="oracle" ><ref bean="org.sakaiproject.authz.impl.DbAuthzGroupSqlOracle" /></entry>
+           </map>
+        </property>
+        <property name="cacheManager" ref="org.sakaiproject.ignite.SakaiCacheManager"/>
+	</bean>
+
+	<bean id="org.sakaiproject.authz.api.SecurityService"
+		  class="org.sakaiproject.authz.impl.SakaiSecurity"
+		  init-method="init"
+		  destroy-method="destroy">
+
+	<property name="threadLocalManager" ref="org.sakaiproject.thread_local.api.ThreadLocalManager" />
+		<property name="authzGroupService" ref="org.sakaiproject.authz.api.AuthzGroupService" />
+		<property name="userDirectoryService" ref="org.sakaiproject.user.api.UserDirectoryService" />
+ 		<property name="cacheManager" ref="org.sakaiproject.ignite.SakaiCacheManager" />
+ 		<property name="entityManager" ref="org.sakaiproject.entity.api.EntityManager" />
+		<property name="sessionManager" ref="org.sakaiproject.tool.api.SessionManager" />
+		<property name="eventTrackingService" ref="org.sakaiproject.event.api.EventTrackingService" />
+		<property name="siteService" ref="org.sakaiproject.site.api.SiteService"/>
+		<property name="functionManager" ref="org.sakaiproject.authz.api.FunctionManager" />
+		<property name="toolManager" ref="org.sakaiproject.tool.api.ToolManager" />
+		<property name="serverConfigurationService" ref="org.sakaiproject.component.api.ServerConfigurationService"/>
+		<property name="cacheMinutes"><value>5</value></property>
+	</bean>
+
+	<bean id="org.sakaiproject.authz.api.FunctionManager"
+			class="org.sakaiproject.authz.impl.FunctionManagerComponent"
+			init-method="init"
+			destroy-method="destroy">
+	</bean>
+
+	<!--
+    Proxy pointing to whichever Group Provider implementation has been assigned
+    the property name "org.sakaiproject.authz.api.GroupProvider". By default, it points to
+    "org.sakaiproject.coursemanagement.impl.provider.CourseManagementGroupProvider".
+    If you use a different Group Provider, there's no need to edit this file.
+    Instead, just use your "sakai.properties" file to point the property to your
+    implementation.
+    -->
+
+	<bean id="org.sakaiproject.authz.api.GroupProvider"
+		  class="org.sakaiproject.util.OptionalProviderFactoryBean">
+		<property name="targetName" value="${org.sakaiproject.authz.api.GroupProvider}" />
+		<property name="proxyInterface" value="org.sakaiproject.authz.api.GroupProvider"/>
+	</bean>
+
+	<bean id="org.sakaiproject.authz.api.RoleProvider"
+		  class="org.sakaiproject.util.OptionalProviderFactoryBean">
+		<property name="targetName" value="${org.sakaiproject.authz.api.RoleProvider}" />
+		<property name="proxyInterface" value="org.sakaiproject.authz.api.RoleProvider"/>
+	</bean>
+
+</beans>
