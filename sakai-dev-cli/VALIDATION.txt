@@ -1,0 +1,9 @@
+CLI-001 validation (performed in container on 2026-10-27)
+- Java compiler: OpenJDK 21, --release 17: PASS
+- CLI smoke test (10 assertions): PASS
+- Executable JAR manifest + version command: PASS
+- Maven build: NOT EXECUTED (Maven not installed in validation container)
+- Live Windows Sakai 8081/8082: NOT TESTED (user runs locally)
+- No source/deployment modifications in CLI-001 commands
+- All database access: NOT IMPLEMENTED
+- No feature implementation or DOM Playwright testing yet (future milestones)
