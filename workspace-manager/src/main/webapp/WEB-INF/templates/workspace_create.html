@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="same-origin" />
+    <title>Create workspace · Sakai Bootstrap</title>
+    <link rel="stylesheet" th:href="@{/assets/workspaces.css(v='wm03')}" href="/workspace-manager/assets/workspaces.css?v=wm03" />
+    <script type="module" th:src="@{/assets/workspace-create.js(v='wm03')}" src="/workspace-manager/assets/workspace-create.js"></script>
+<style>html,body{margin:0;width:100%;max-width:100%;min-width:0;overflow-x:hidden}.shell{width:100%;max-width:100%;margin:0;padding:18px clamp(16px,3vw,38px)}.wizard-step{display:block;max-width:100%}.field input,.field textarea{display:block;max-width:100%}.workspace-grid{grid-template-columns:repeat(auto-fill,minmax(min(240px,100%),1fr))}</style>
+</head>
+<body>
+<main class="shell create-shell" aria-labelledby="create-title">
+    <header class="topbar"><div class="brand"><span class="brand-mark" aria-hidden="true">S</span>
+        <span>Sakai <strong>Bootstrap</strong><small>Developer workspace console</small></span></div>
+        <span class="environment">WM03 · Workspace creation</span></header>
+    <div class="create-header"><a class="back-link" th:href="@{/index}" href="index">← All workspaces</a>
+        <p class="eyebrow">CREATE A SPACE</p><h1 id="create-title">New application workspace</h1>
+        <p class="intro">A private environment for your team and installed Sakai tools.</p></div>
+    <form id="workspace-create-form" th:action="@{/create}" action="create" method="post" novalidate="novalidate">
+        <input type="hidden" name="csrfToken" th:value="${csrfToken}" />
+        <input type="hidden" name="formNonce" th:value="${formNonce}" />
+        <input type="hidden" name="type" value="application" />
+        <input type="hidden" name="visibility" value="private" />
+        <div th:if="${error}" class="form-error" role="alert" th:text="${error}"></div>
+        <ol class="step-nav" aria-label="Setup steps"><li class="current">1. Details</li><li>2. Applications</li><li>3. Review</li></ol>
+        <section class="wizard-step" data-step="1" aria-labelledby="details-title">
+            <h2 id="details-title">Workspace details</h2><p class="step-description">Choose how this workspace appears in your portal.</p>
+            <label class="field">Workspace name <span class="required">Required</span>
+                <input name="name" id="create-name" type="text" autocomplete="off" minlength="3" maxlength="100" required
+                       th:value="${name}" value="Customer Portal" />
+                <small>3–100 characters. The site identifier is generated securely on the server.</small></label>
+            <label class="field">Description <span class="optional">Optional</span>
+                <textarea name="description" id="create-description" maxlength="500" rows="3" th:text="${description}"></textarea></label>
+            <div class="readonly-fields"><div><span>Workspace type</span><strong>Application</strong><small>Backed by Sakai's project-site services</small></div>
+                <div><span>Visibility</span><strong>Private</strong><small>Members only; guest access disabled</small></div></div>
+        </section>
+        <section class="wizard-step" data-step="2" aria-labelledby="apps-title">
+            <h2 id="apps-title">Applications</h2><p class="step-description">A starting page will be installed automatically.</p>
+            <div class="app-choice"><span class="app-symbol" aria-hidden="true">▦</span><div><strong>Workspace Manager</strong><small>Included · View your authorized workspaces</small></div><span class="installed">Included</span></div>
+            <p class="quiet-note">Additional application installation and customization will arrive in WM05. No unapproved Java code is installed by this wizard.</p>
+        </section>
+        <section class="wizard-step" data-step="3" aria-labelledby="review-title">
+            <h2 id="review-title">Review your workspace</h2><p class="step-description">The workspace is created only after confirmation.</p>
+            <dl class="review-list"><div><dt>Name</dt><dd id="review-name">Customer Portal</dd></div>
+                <div><dt>Type</dt><dd>Application</dd></div><div><dt>Visibility</dt><dd>Private</dd></div>
+                <div><dt>Owner</dt><dd>Your current Sakai account</dd></div><div><dt>Starting tool</dt><dd>Workspace Manager</dd></div></dl>
+            <p class="quiet-note">Your account must have Sakai project site-creation permissions. Members can be managed by workspace maintainers in WM03; invitations are planned for WM04.</p>
+        </section>
+        <div class="wizard-actions"><button type="button" id="previous-step" class="secondary-button" hidden>Back</button>
+            <button type="button" id="next-step" class="primary-button">Continue →</button>
+            <button type="submit" id="create-submit" class="primary-button" hidden>Create private workspace</button></div>
+        <noscript><p class="quiet-note">JavaScript is disabled. Review all three sections, then use this submit button:</p>
+            <button type="submit" class="primary-button">Create private workspace</button></noscript>
+    </form>
+    <footer><span>Permissions and persistence are enforced by Sakai.</span><span>WM02 · Private application workspaces</span></footer>
+</main>
+</body>
+</html>

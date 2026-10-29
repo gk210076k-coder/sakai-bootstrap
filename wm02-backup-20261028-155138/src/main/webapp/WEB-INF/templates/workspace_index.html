@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="same-origin" />
+    <title>Workspaces · Sakai Bootstrap</title>
+    <link rel="stylesheet" th:href="@{/assets/workspaces.css}" href="/assets/workspaces.css" />
+    <script type="module" th:src="@{/assets/workspaces.js}" src="/assets/workspaces.js"></script>
+</head>
+<body>
+<main class="shell" aria-labelledby="page-title">
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">S</span>
+            <span>Sakai <strong>Bootstrap</strong><small>Developer workspace console</small></span></div>
+        <span class="environment">WM01 · Workspace catalog</span>
+    </header>
+    <section class="headline">
+        <div>
+            <p class="eyebrow">YOUR ENVIRONMENT</p>
+            <h1 id="page-title">Workspaces</h1>
+            <p class="intro">Your project and application spaces, backed by Sakai permissions.</p>
+        </div>
+        <div class="count" aria-label="Authorized workspace count">
+            <span th:text="${workspaceCount}">0</span><small>accessible</small>
+        </div>
+    </section>
+    <section class="toolstrip" aria-label="Workspace filters">
+        <label class="search-wrap"><span class="sr-only">Search workspaces</span>
+            <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="1.8"/></svg>
+            <input id="workspace-search" type="search" autocomplete="off" placeholder="Search workspaces" />
+        </label>
+        <label class="select-wrap">Type
+            <select id="workspace-type">
+                <option value="all">All types</option>
+                <option value="project">Project</option>
+                <option value="application">Application</option>
+            </select>
+        </label>
+        <label class="select-wrap">State
+            <select id="workspace-state">
+                <option value="all">All states</option>
+                <option value="published">Published</option>
+                <option value="draft">Unpublished</option>
+            </select>
+        </label>
+    </section>
+    <div class="list-top"><h2>Available spaces</h2><span id="visible-count" aria-live="polite"></span></div>
+    <div id="workspace-list" class="workspace-grid" th:if="${workspaceCount > 0}">
+        <article class="workspace-card" th:each="workspace : ${workspaces}"
+                 th:attr="data-type=${workspace.type},data-state=${workspace.published ? 'published' : 'draft'},data-name=${workspace.title}">
+            <div class="card-head"><span class="workspace-icon" aria-hidden="true">▦</span>
+                <span class="pill" th:classappend="${workspace.published} ? ' published' : ' draft'"
+                      th:text="${workspace.published} ? 'Published' : 'Unpublished'">Published</span></div>
+            <h3 th:text="${workspace.title}">Workspace</h3>
+            <p class="workspace-meta"><span th:text="${workspace.type}">project</span> ·
+                <span th:text="${workspace.role}">member</span></p>
+            <a class="open-link" th:href="${workspace.portalUrl}" target="_top">Open workspace <span aria-hidden="true">↗</span></a>
+        </article>
+    </div>
+    <section th:if="${workspaceCount == 0}" class="empty" role="status">
+        <div class="empty-icon" aria-hidden="true">▦</div>
+        <h2>No project or application workspaces yet</h2>
+        <p>Only spaces you can access appear here. Workspace creation is planned for WM02.</p>
+    </section>
+    <section id="no-results" class="empty" role="status" hidden>
+        <h2>No matching workspaces</h2>
+        <p>Try a different name, type, or publication state.</p>
+    </section>
+    <footer><span>Existing Sakai sites and permissions remain authoritative.</span>
+        <span>Read-only dashboard · WM01</span></footer>
+</main>
+</body>
+</html>

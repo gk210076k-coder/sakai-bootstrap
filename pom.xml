@@ -40,6 +40,8 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
+                <module>workspace-manager</module>
+
                 <module>master</module>
                 <module>admin-tools</module>
                 <module>admin-su</module>

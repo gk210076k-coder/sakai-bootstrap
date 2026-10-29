@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta name="referrer" content="no-referrer"/>
+  <title>Invitations · Sakai Bootstrap</title>
+  <link rel="stylesheet" th:href="@{/assets/workspaces.css(v='wm04')}"/>
+  <style>
+    .wm04-wrap{max-width:1080px;margin:0 auto;padding:24px clamp(16px,3vw,38px)}
+    .wm04-header{margin:24px 0}.wm04-header h1{font-size:clamp(28px,4vw,38px);letter-spacing:-.04em}
+    .wm04-grid{display:grid;grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr);gap:20px}
+    .wm04-panel{padding:24px;background:#fff;border:1px solid #dce4ef;border-radius:16px;min-width:0}
+    .wm04-panel h2{font-size:20px;margin:0 0 10px}.wm04-panel p{color:#536176}
+    .wm04-table{width:100%;border-collapse:collapse;font-size:13px}.wm04-table th,.wm04-table td{padding:12px 9px;text-align:left;border-bottom:1px solid #e8eef5;word-break:break-word}
+    .wm04-table th{color:#5a687c}.wm04-form label{display:block;margin:14px 0;font-weight:600}
+    .wm04-form input,.wm04-form select{display:block;width:100%;max-width:100%;padding:12px;margin-top:7px;border:1px solid #cbd6e4;border-radius:9px;box-sizing:border-box}
+    .wm04-button{background:#153b70;color:#fff;border:0;border-radius:9px;padding:11px 15px;cursor:pointer;font-weight:650}
+    .wm04-button.subtle{background:#f3f6fa;color:#21416c;border:1px solid #d9e3f0}
+    .wm04-link{display:block;overflow-wrap:anywhere;padding:13px;border:1px solid #bddfc4;border-radius:9px;background:#f1fbf3}
+    .wm04-alert{padding:15px;border-radius:10px;margin:18px 0}.wm04-alert.good{background:#effaf2;border:1px solid #b5e1c0}.wm04-alert.bad{background:#fff1f1;border:1px solid #eec4c4}
+    .wm04-help{font-size:13px;color:#59677a}.wm04-empty{padding:20px;text-align:center;color:#627188}
+    @media(max-width:820px){.wm04-grid{grid-template-columns:1fr}.wm04-panel{padding:17px}.wm04-table{display:block;overflow-x:auto}}
+  </style>
+</head>
+<body>
+<main class="wm04-wrap">
+ <header class="topbar"><div class="brand"><span class="brand-mark">S</span><span>Sakai <strong>Bootstrap</strong><small>Team access</small></span></div><span class="environment">WM04 · Invitations</span></header>
+ <div class="wm04-header"><a class="back-link" th:href="@{/members/{id}(id=${workspace.siteId})}">← Back to Members</a><p class="eyebrow">WORKSPACE ACCESS</p><h1>Invite collaborators</h1><p th:text="${workspace.title}">Private application workspace</p></div>
+ <div th:if="${param.revoked}" class="wm04-alert good" role="status">Invitation revoked. The link is no longer usable.</div>
+ <div th:if="${error}" class="wm04-alert bad" role="alert" th:text="${error}"></div>
+ <div th:if="${newInviteLink}" class="wm04-alert good" role="status">
+   <strong>Invitation created for <span th:text="${newInvitee}">recipient</span>.</strong>
+   <p>Copy the private link now. It is shown only in this response and cannot be recovered later. It expires in seven days.</p>
+   <code class="wm04-link" th:text="${newInviteLink}">/workspace-manager/invitations/respond?token=...</code>
+   <p class="wm04-help">Use your trusted Sakai Bootstrap host before this relative path. Share only with the intended account holder. The recipient must sign in as that exact account.</p>
+ </div>
+ <div class="wm04-grid">
+  <section class="wm04-panel" aria-labelledby="invite-title"><h2 id="invite-title">Create invitation</h2><p>Send a one-time invitation to an existing Sakai user. Membership is assigned only after acceptance.</p>
+   <form class="wm04-form" th:action="@{/members/{id}/invitations(id=${workspace.siteId})}" method="post">
+    <input type="hidden" name="csrfToken" th:value="${csrfToken}"/><input type="hidden" name="formNonce" th:value="${formNonce}"/>
+    <label for="inv-user">Sakai user ID<input id="inv-user" name="userId" maxlength="99" autocomplete="off" required placeholder="Exact internal user ID"/></label>
+    <label for="inv-role">Role upon acceptance<select id="inv-role" name="role"><option value="access">Access — workspace member</option><option value="maintain">Maintain — workspace maintainer</option></select></label>
+    <button class="wm04-button" type="submit">Create invitation</button>
+   </form><p class="wm04-help">Expires after 7 days. Can be revoked before acceptance. Existing membership, original owner and superuser roles cannot be overwritten.</p>
+  </section>
+  <section class="wm04-panel" aria-labelledby="pending-title"><h2 id="pending-title">Invitation history</h2><p>Only workspace maintainers can view this list.</p>
+    <div th:if="${#lists.isEmpty(workspace.invitations)}" class="wm04-empty">No invitations created yet.</div>
+    <table th:unless="${#lists.isEmpty(workspace.invitations)}" class="wm04-table"><thead><tr><th>Invited user</th><th>Role</th><th>Status</th><th>Action</th></tr></thead>
+     <tbody><tr th:each="inv : ${workspace.invitations}"><td th:text="${inv.invitee}">user</td><td th:text="${inv.role}">access</td><td th:text="${inv.status}">PENDING</td><td>
+        <form th:if="${inv.revocable}" th:action="@{/members/{id}/invitations/revoke(id=${workspace.siteId})}" method="post">
+         <input type="hidden" name="csrfToken" th:value="${csrfToken}"/><input type="hidden" name="formNonce" th:value="${formNonce}"/>
+         <input type="hidden" name="invitationId" th:value="${inv.id}"/><button class="wm04-button subtle" type="submit">Revoke</button>
+        </form><span th:unless="${inv.revocable}">—</span>
+     </td></tr></tbody>
+    </table>
+  </section>
+ </div>
+ <footer><span>Native Sakai membership remains authoritative.</span><span>WM04 · Private invitations</span></footer>
+</main>
+</body>
+</html>

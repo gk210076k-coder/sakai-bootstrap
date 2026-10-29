@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<registration>
+    <tool id="sakai.bootstrap.workspaces"
+          title="Workspace Manager"
+          description="View your authorized project and application workspaces.">
+        <category name="myworkspace" />
+        <category name="project" />
+    </tool>
+</registration>

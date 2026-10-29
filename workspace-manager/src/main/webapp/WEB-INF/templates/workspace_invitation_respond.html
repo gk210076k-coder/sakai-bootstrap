@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><meta name="referrer" content="no-referrer"/><title>Respond to invitation · Sakai Bootstrap</title><link rel="stylesheet" th:href="@{/assets/workspaces.css(v='wm04')}"/><style>.card{max-width:580px;margin:6vh auto;padding:30px;border:1px solid #dfe6f1;background:white;border-radius:18px}.card h1{font-size:30px}.card p{color:#516176}.action{display:flex;flex-wrap:wrap;gap:12px}.action button{padding:12px 18px;border-radius:10px;cursor:pointer;border:1px solid #c9d6e6;background:#fff;font-weight:600}.action .primary{background:#173d75;color:white}.state{font-weight:600}</style></head><body>
+<main class="card"><p class="eyebrow">SAKAI BOOTSTRAP · WM04</p><h1>Workspace invitation</h1>
+ <p><strong th:text="${invitation.siteTitle}">Workspace</strong> invited your Sakai account to collaborate.</p>
+ <p>Invited as: <strong th:text="${invitation.role}">access</strong></p><p>From: <span th:text="${invitation.inviter}">inviter</span></p>
+ <p>Account: <span th:text="${invitation.target}">user</span></p>
+ <p class="state">Status: <span th:text="${invitation.status}">PENDING</span></p>
+ <div th:if="${invitation.status == 'PENDING'}" class="action">
+  <form th:action="@{/invitations/accept}" method="post"><input type="hidden" name="csrfToken" th:value="${csrfToken}"/><input type="hidden" name="formNonce" th:value="${formNonce}"/><input type="hidden" name="token" th:value="${inviteToken}"/><button class="primary" type="submit">Accept invitation</button></form>
+  <form th:action="@{/invitations/decline}" method="post"><input type="hidden" name="csrfToken" th:value="${csrfToken}"/><input type="hidden" name="formNonce" th:value="${formNonce}"/><input type="hidden" name="token" th:value="${inviteToken}"/><button type="submit">Decline</button></form>
+ </div>
+ <p th:unless="${invitation.status == 'PENDING'}">This invitation is no longer available for acceptance.</p><p><a th:href="@{/index}">Back to your workspaces</a></p>
+</main></body></html>

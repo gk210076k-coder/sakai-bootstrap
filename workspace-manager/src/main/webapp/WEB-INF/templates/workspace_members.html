@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="referrer" content="same-origin" />
+    <title>Members · Sakai Bootstrap</title>
+    <link rel="stylesheet" th:href="@{/assets/workspaces.css(v='wm03')}" href="/workspace-manager/assets/workspaces.css?v=wm03" />
+    <style>html,body{margin:0;width:100%;max-width:100%;min-width:0;overflow-x:hidden}.shell{width:100%;max-width:100%;margin:0;padding:18px clamp(16px,3vw,38px)}.members-layout{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(270px,.7fr);gap:18px}.members-panel{background:white;border:1px solid #e4e9f1;border-radius:16px;padding:22px;min-width:0}@media(max-width:800px){.members-layout{grid-template-columns:1fr}}</style>
+</head>
+<body>
+<main class="shell" aria-labelledby="page-title">
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">S</span><span>Sakai <strong>Bootstrap</strong><small>Workspace access control</small></span></div>
+        <span class="environment">WM03 · Members</span>
+    </header>
+    <div class="create-header">
+        <a class="back-link" th:href="@{/index}" href="/workspace-manager/index">← Workspaces</a>
+        <p class="eyebrow">ACCESS MANAGEMENT</p>
+        <h1 id="page-title">Members</h1>
+        <p class="intro"><strong th:text="${workspace.title}">Customer Portal</strong> · Private application workspace</p>
+        <a class="open-link" th:href="${workspace.portalUrl}" target="_top">Open workspace ↗</a>
+        <a class="open-link" th:href="@{/members/{id}/invitations(id=${workspace.siteId})}">Manage invitations ↗</a>
+    </div>
+    <div th:if="${param.updated}" class="success-message" role="status">Membership updated. Sakai permissions are now authoritative.</div>
+    <div th:if="${error}" class="form-error" role="alert" th:text="${error}"></div>
+    <div class="members-layout">
+        <section class="members-panel" aria-labelledby="current-members">
+            <h2 id="current-members">Current members</h2>
+            <p class="step-description">Only authorized workspace maintainers can view or change membership.</p>
+            <div class="members-table-wrap">
+                <table class="members-table">
+                    <thead><tr><th scope="col">Sakai user ID</th><th scope="col">Role</th><th scope="col">Status</th><th scope="col">Action</th></tr></thead>
+                    <tbody>
+                    <tr th:each="member : ${workspace.members}">
+                        <td class="member-id" th:text="${member.userId}">admin</td>
+                        <td><span class="pill" th:text="${member.role}">maintain</span></td>
+                        <td th:text="${member.active} ? 'Active' : 'Inactive'">Active</td>
+                        <td>
+                            <form th:if="${member.canRemove}" th:action="@{/members/{id}/remove(id=${workspace.siteId})}" method="post">
+                                <input type="hidden" name="csrfToken" th:value="${csrfToken}" />
+                                <input type="hidden" name="formNonce" th:value="${formNonce}" />
+                                <input type="hidden" name="userId" th:value="${member.userId}" />
+                                <button class="secondary-button small-button" type="submit">Remove</button>
+                            </form>
+                            <span th:unless="${member.canRemove}" class="safe-label">Protected</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <section class="members-panel" aria-labelledby="grant-heading">
+            <h2 id="grant-heading">Add or update a member</h2>
+            <p class="step-description">Assign a role to an existing Sakai account. Updating a member replaces that member's site role.</p>
+            <form th:action="@{/members/{id}/grant(id=${workspace.siteId})}" method="post">
+                <input type="hidden" name="csrfToken" th:value="${csrfToken}" />
+                <input type="hidden" name="formNonce" th:value="${formNonce}" />
+                <label class="field" for="member-user">Sakai user ID <span class="required">Required</span>
+                    <input id="member-user" name="userId" type="text" maxlength="99" required autocomplete="off" placeholder="Exact user ID" />
+                    <small>Use the account's internal Sakai ID, not its display name.</small>
+                </label>
+                <label class="field" for="member-role">Workspace role
+                    <select id="member-role" name="role" required>
+                        <option value="access">Access — open workspace</option>
+                        <option value="maintain">Maintain — manage workspace</option>
+                    </select>
+                </label>
+                <button class="primary-button" type="submit">Save membership</button>
+            </form>
+            <p class="quiet-note">The current maintainer cannot remove or demote themselves. The last active maintainer is protected. Global realm templates remain unchanged.</p>
+        </section>
+    </div>
+    <footer><span>Sakai SiteService enforces role changes and persists them in the site realm.</span><span>WM03 · Member management</span></footer>
+</main>
+</body>
+</html>
